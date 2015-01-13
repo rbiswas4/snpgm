@@ -1,6 +1,9 @@
-# generated directory
+# generated directories
 testdata
+lcplots
 
+# emacs
+*~
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
