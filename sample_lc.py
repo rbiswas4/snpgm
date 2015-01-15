@@ -9,6 +9,8 @@ import numpy as np
 import sncosmo
 import emcee
 import triangle
+import matplotlib as mpl
+mpl.use('Agg')
 from matplotlib import pyplot as plt
 from astropy.cosmology import FlatLambdaCDM
 
@@ -17,10 +19,10 @@ if not os.path.exists("lcplots"):
 
 # sampler parameters
 ndim = 4
-nwalkers = 100 #20
+nwalkers = 130 #20
 nburn = 50 #100
 nsamples = 200 #500
-n_obs = 10
+n_obs = 15
 
 # define likelihood
 model = sncosmo.Model(source='salt2-extended')
@@ -108,7 +110,7 @@ def sample_all(data_list):
     
     # Create sampler
     sampler = emcee.EnsembleSampler(nwalkers, ndim, full_lnlike, 
-                                    args = (data_list,), threads=24*2)
+                                    args = (data_list,), threads=24)
 
     # Starting positions
     current = np.empty(ndim)
@@ -151,21 +153,25 @@ for fname in fnames[0:1]:
                .replace(".dat", "_corner.png"))
     plt.savefig(figname)
 """
+# Get data from all SNe
 data_list = []
 for fname in fnames[:n_obs]:
     
     data = sncosmo.read_lc(fname)
     data_list.append(data)
 
+# Do MCMC:
 all_samples = sample_all(data_list)
-
+np.savetxt('emcee_samples.dat', all_samples)
 all_params = np.average(all_samples, axis = 0)
 
+# Make plots of best fit global parameters and histograms of best fit 
+# parameters for each supernova:
 labels = ['Omega', 'x0_0', 'alpha', 'beta']
 fig = triangle.corner(all_samples[:,:4], labels=labels, bins=30)
 plt.savefig('global_params_%ssne.png' % n_obs)
 
-fig2, axes = plt.subplots(4,1)
+fig2, axes = plt.subplots(2,2)
 titles = ['t0', 'sigma', 'x1', 'c']
 for a in range(4):
     best_fits = [np.median(all_samples[:,4+s*4+a]) for s in range(n_obs)]
