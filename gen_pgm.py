@@ -15,14 +15,12 @@ pgm.add_node(Node("x1dist", r"$x_1^{\mathrm{dist}}$", 4, 4))
 pgm.add_node(Node("cdist", r"$c^{\mathrm{dist}}$", 5, 4))
 
 # Per-SN parameters:  top line in the plate
-pgm.add_node(Node("sigitrue",
-                  r"$\sigma_{\mathrm{int}, i}^{\mathrm{true}}$", 3, 3))
 pgm.add_node(Node("x1itrue", r"$x_{1,i}^\mathrm{true}$", 4, 3))
 pgm.add_node(Node("citrue", r"$c_i^\mathrm{true}$", 5, 3))
 
 # Per-SN parameters: second line in the plate
 pgm.add_node(Node("x0itrue", r"$x_{0,i}^\mathrm{true}$", 3, 2))
-pgm.add_node(Node("mui", r"$\mu_i$", 2, 2))
+#pgm.add_node(Node("mui", r"$\mu_i$", 2, 2))
 
 # Per-SN parameters: third line in the plate
 pgm.add_node(Node("zi", r"$z_i$", 2, 1, observed=True))
@@ -48,17 +46,15 @@ pgm.add_node(Node("nuisance",
 # Add in the edges.
 pgm.add_edge("x1dist", "x1itrue")
 pgm.add_edge("cdist", "citrue")
-pgm.add_edge("sigdist", "sigitrue")
+pgm.add_edge("sigdist", "x0itrue")
 
 pgm.add_edge("x1itrue", "x0itrue")
 pgm.add_edge("citrue", "x0itrue")
-pgm.add_edge("sigitrue", "x0itrue")
 
-pgm.add_edge("cosmology", "mui")
-pgm.add_edge("mui", "x0itrue")
+pgm.add_edge("cosmology", "x0itrue")
 pgm.add_edge("nuisance", "x0itrue")
 
-pgm.add_edge("zi", "mui")
+pgm.add_edge("zi", "x0itrue")
 
 pgm.add_edge("x0itrue", "fij")
 pgm.add_edge("x1itrue", "fij")
