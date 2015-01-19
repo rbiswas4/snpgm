@@ -13,8 +13,8 @@ from astropy.cosmology import FlatLambdaCDM
 from matplotlib import pyplot as plt
 import triangle
 
-if not os.path.exists("lcsamples"):
-    os.mkdir("lcsamples")
+if not os.path.exists("samples"):
+    os.mkdir("samples")
 
 # sampler parameters
 ndim = 4
@@ -78,7 +78,7 @@ for fname in fnames:
     # read data, run sampler on it, save samples
     data = sncosmo.read_lc(fname)
     samples = sample(data)
-    sfname = (fname.replace("testdata", "lcsamples")
+    sfname = (fname.replace("testdata", "samples")
                .replace(".dat", ".npy"))
     np.save(sfname, samples)
 
