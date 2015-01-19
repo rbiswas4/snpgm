@@ -30,14 +30,11 @@ def lnlike(parameters, snsamples):
     for i, b in global_bounds.items():
         if not b[0] < parameters[i] < b[1]:
             return -np.inf
-    n_sne = len(snsamples)
 
     Om0, x0_0, alpha, beta = parameters
-
     cosmo = FlatLambdaCDM(Om0=Om0, H0=70.)
 
-    # Loop over SNe
-    sn_lnlike = np.empty(n_sne)
+    # Loop over SNe, accumulate likelihood
     logltot = 0.
     for z, samples in snsamples:
 
@@ -48,7 +45,7 @@ def lnlike(parameters, snsamples):
         # calculate x0 prior for each sample
         mu = cosmo.distmod(z).value
         x0ctr = x0_0 * 10**(-0.4 * (-alpha*x1 + beta*c + mu))
-        x0sigma = 0.15
+        x0sigma = x0ctr * 0.15
 
         weights = (1. / (x0sigma * np.sqrt(2. * np.pi)) *
                    np.exp( -(x0 - x0ctr)**2 / (2. * x0sigma**2)))
@@ -82,8 +79,7 @@ for fname in sorted(glob("testdata/*")):
     snsamples.append((z, samples))
 
 # Create sampler
-sampler = emcee.EnsembleSampler(nwalkers, ndim, lnlike, 
-                                args = (snsamples,), threads=1)
+sampler = emcee.EnsembleSampler(nwalkers, ndim, lnlike, args=(snsamples,))
 
 # Starting positions
 current = np.array([0.7, 1e12, 1.5,2.5])
