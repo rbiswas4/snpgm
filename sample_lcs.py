@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """Sample one light curve at a time, plot the model and make a corner plot."""
 
+from __future__ import print_function
+
 import os
 from os.path import join, basename
 from glob import glob
@@ -21,7 +23,7 @@ ndim = 4
 nwalkers = 20
 nburn = 100
 nsamples = 500
-
+thin = 10
 
 # define likelihood
 model = sncosmo.Model(source='salt2-extended')
@@ -52,7 +54,8 @@ def sample(data):
     model.set(z=data.meta['z'])
 
     # Create sampler
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, lnlike, args=(data,), a = 3.50)
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, lnlike, args=(data,),
+                                    a = 3.50)
 
     # Starting positions of walkers.
     # Here we cheat by setting the "guess" equal to the known true parameters!
@@ -66,7 +69,7 @@ def sample(data):
     sampler.reset()
 
     # production run
-    sampler.run_mcmc(pos, nsamples)
+    sampler.run_mcmc(pos, nsamples, thin=thin)
     print("Avg acceptance fraction:", np.mean(sampler.acceptance_fraction))
 
     return sampler.flatchain
@@ -74,7 +77,9 @@ def sample(data):
 
 fnames = sorted(glob("testdata/*"))
 for fname in fnames:
-  
+                                
+    print("processing", fname)
+
     # read data, run sampler on it, save samples
     data = sncosmo.read_lc(fname)
     samples = sample(data)
@@ -83,17 +88,17 @@ for fname in fnames:
     np.save(sfname, samples)
 
     # show mean parameters model with data
-    showparams = np.average(samples, axis=0)
-    figname = (fname.replace("testdata", "lcplots")
-               .replace(".dat", "_lcfit.png"))
-    model.parameters[1:5] = showparams
-    sncosmo.plot_lc(data, model, fname=figname)
+    #showparams = np.average(samples, axis=0)
+    #figname = (fname.replace("testdata", "lcplots")
+    #           .replace(".dat", "_lcfit.png"))
+    #model.parameters[1:5] = showparams
+    #sncosmo.plot_lc(data, model, fname=figname)
 
     # Corner plot of samples.
-    labels = ["${0}$".format(s) for s in model.param_names_latex[1:5]]
-    fig = triangle.corner(samples, labels=labels, bins=30)
-    figname = (fname.replace("testdata", "lcplots")
-               .replace(".dat", "_corner.png"))
-    plt.savefig(figname)
+    #labels = ["${0}$".format(s) for s in model.param_names_latex[1:5]]
+    #fig = triangle.corner(samples, labels=labels, bins=30)
+    #figname = (fname.replace("testdata", "lcplots")
+    #           .replace(".dat", "_corner.png"))
+    #plt.savefig(figname)
 
 

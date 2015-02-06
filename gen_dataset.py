@@ -14,7 +14,7 @@ import sncosmo
 if not os.path.exists("testdata"):
     os.mkdir("testdata")
 
-nsne = 15
+nsne = 200
 
 # True distributions
 x1_dist = norm(0., 1.)
@@ -31,7 +31,12 @@ beta = 2.5
 
 # generate set of true parameters for each SN
 np.random.seed(0)
-z_true = rand(nsne)
+
+# put some sne at low z and some at high-z
+z_true = np.empty(nsne)
+z_true[0:50] = 0.02 + 0.08 * rand(50)
+z_true[50:] = 0.5 + 0.1 * rand(nsne-50)
+
 t0_true = np.zeros(nsne)
 x1_true = x1_dist.rvs(nsne)
 c_true = c_dist.rvs(nsne)
