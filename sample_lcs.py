@@ -52,7 +52,7 @@ def sample(data):
     model.set(z=data.meta['z'])
 
     # Create sampler
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, lnlike, args=(data,))
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, lnlike, args=(data,), a = 3.50)
 
     # Starting positions of walkers.
     # Here we cheat by setting the "guess" equal to the known true parameters!
