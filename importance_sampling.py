@@ -65,17 +65,21 @@ def lnlike(parameters, snsamples):
 # Main
 
 # sampler parameters
-ndim = 5
+ndim = 8
 nwalkers = 20
 nburn = 200
 nsamples = 500
 
 global_bounds = {0: (0., 1.), # Omega_M
-                 1: (1e11, 1e13), # x0_0
-                 2: (0., 1.),  # dx0 (fractional scatter in x0)
-                 3: (0., 3.), # alpha
-                 4: (1., 5.)} # beta
+                 1: (1e11, 1e13), # x0_0A
+                 2: (0., 1.),  # dx0A (fractional scatter in x0)
+                 3: (1e11, 1e13), # x0_0B
+                 4: (0., 1.),  # dx0B (fractional scatter in x0)
+                 5: (0., 1.),  # n_A
+                 6: (0., 3.), # alpha
+                 7: (1., 5.)} # beta
 
+                 
 # Read all SN redshifts and previously-generated parameter samples
 snsamples = []
 for fname in sorted(glob("testdata/*")):
@@ -88,7 +92,7 @@ for fname in sorted(glob("testdata/*")):
 sampler = emcee.EnsembleSampler(nwalkers, ndim, lnlike, args=(snsamples,))
 
 # Starting positions
-current = np.array([0.7, 1e12, 0.15, 1.5, 2.5])
+current = np.array([0.7, 1e12, 0.1, 2e12, 0.1, 0.5, 1.5, 2.5])
 errors = current*0.01
 pos = np.array([current + errors*np.random.randn(ndim)
                 for i in range(nwalkers)])
