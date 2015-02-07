@@ -31,7 +31,7 @@ def lnlike(parameters, snsamples):
         if not b[0] < parameters[i] < b[1]:
             return -np.inf
 
-    Om0, x0_0, dx0, alpha, beta = parameters
+    Om0, x0_0A, dx0_A, x0_0B, dx0_B, n_A, alpha, beta = parameters
     cosmo = FlatLambdaCDM(Om0=Om0, H0=70.)
 
     # Loop over SNe, accumulate likelihood
@@ -44,11 +44,17 @@ def lnlike(parameters, snsamples):
 
         # calculate x0 prior for each sample
         mu = cosmo.distmod(z).value
-        x0ctr = x0_0 * 10**(-0.4 * (-alpha*x1 + beta*c + mu))
-        x0sigma = x0ctr * dx0
+        x0ctr_A = x0_0A * 10**(-0.4 * (-alpha*x1 + beta*c + mu))
+        x0sigma_A = x0ctr_A * dx0_A/2.5
 
-        weights = (1. / (x0sigma * np.sqrt(2. * np.pi)) *
-                   np.exp( -(x0 - x0ctr)**2 / (2. * x0sigma**2)))
+        x0ctr_B = x0_0B * 10**(-0.4 * (-alpha*x1 + beta*c + mu))
+        x0sigma_B = x0ctr_B * dx0_B/2.5
+
+        weights = (n_A / (x0sigma_A * np.sqrt(2. * np.pi)) *
+                   np.exp( -(x0 - x0ctr_A)**2 / (2. * x0sigma_A**2))
+                   + (1. - n_A) / (x0sigma_B * np.sqrt(2. * np.pi)) *
+                   np.exp( -(x0 - x0ctr_B)**2 / (2. * x0sigma_B**2)))
+                   
 
         logltot += np.log(weights.sum())
 

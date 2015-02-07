@@ -25,7 +25,6 @@ sigmaint_dist = norm(0., 0.15)
 cosmo = FlatLambdaCDM(Om0=0.7, H0=70.)
 
 # True nuisance parameters
-x0_0 = 1e12  # x0 at distance modulus 0.
 alpha = 1.5
 beta = 2.5
 
@@ -37,12 +36,25 @@ z_true = np.empty(nsne)
 z_true[0:50] = 0.02 + 0.08 * rand(50)
 z_true[50:] = 0.5 + 0.1 * rand(nsne-50)
 
+x0_0A = 1e12  # x0 at distance modulus 0.
+x0_0B = 2e12
+n_A = 0.5 # relative normalize [0,1]
+
+ranseed = rand(nsne)
+x0_0 = np.zeros(nsne)
+for i in range(0,nsne):
+    if ranseed[i] <= n_A:
+        x0_0_dist = norm(x0_0A,0.10*x0_0A/2.5)
+        x0_0[i] = x0_0_dist.rvs(1)
+    else:
+        x0_0_dist = norm(x0_0B, 0.10*x0_0B/2.5)
+        x0_0[i] = x0_0_dist.rvs(1)
+
 t0_true = np.zeros(nsne)
 x1_true = x1_dist.rvs(nsne)
 c_true = c_dist.rvs(nsne)
-sigma_true = sigmaint_dist.rvs(nsne)
 x0_true = x0_0 * 10**(-0.4 * (-alpha*x1_true + beta*c_true +
-                              cosmo.distmod(z_true).value + sigma_true))
+                              cosmo.distmod(z_true).value ))
 
 # Pretend we observe all SNe with the same cadence and bands
 time = np.arange(-30., 70.)
