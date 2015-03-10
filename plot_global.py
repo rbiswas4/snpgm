@@ -4,12 +4,22 @@ import numpy as np
 import triangle
 from matplotlib import pyplot as plt
 
-samples = np.load("samples/globalsamples.npy")
+import Population_Models as PM
 
-labels = [r'$\Omega_\mathrm{M}$', r'$x_{00}$', r'$\sigma_{\mathrm{int}}$',
-          r'$\alpha$', r'$\beta$']
-truths = [0.7, 1.e12, 0.15, 1.5, 2.5]  # from gen_dataset
 
-fig = triangle.corner(samples, labels=labels, bins=15,
+### Inputs
+Model = PM.SinglePop() 
+N = 20
+###
+def plot_global(nsne, under_model):
+    samples = np.load("samples_%s/globalsamples_%s.npy"%(under_model.name(nsne),under_model.name(nsne)))
+
+    labels = under_model.labels 
+    truths = under_model.initial
+
+    fig = triangle.corner(samples, labels=labels, bins=15,
                       truths=truths)
-plt.savefig('globalsamples.png')
+    plt.savefig('globalsamples_%s.png'%(under_model.name(nsne)))
+    return
+
+plot_global(N, Model)
